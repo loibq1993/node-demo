@@ -1,10 +1,19 @@
 'use strict';
 const User =  require('../models/user');
+var bcrypt = require('bcryptjs');
+var salt = bcrypt.genSaltSync(10);
+
+export function listUser(req, res) {
+  User.find({}, function (err, user) {
+    return res.status(200).json(user);
+  });
+}
 
 // create new cause
 export function createUser(req, res) {
   var newUser = new User(req.body);
-  newUser.hash_password = bcrypt.hashSync(req.body.password, 10);
+  var hash = bcrypt.hashSync("B4c0/\/", salt);
+  newUser.hash_password = bcrypt.hashSync(req.body.hash_password, salt);
   newUser.save(function(err, user) {
     if (err) {
       return res.status(400).send({
@@ -16,6 +25,16 @@ export function createUser(req, res) {
     }
   });
 };
+
+export function editUser(req, res) {
+   User.findOneAndUpdate({
+    email: req.body.email,
+    hash_password: bcrypt.hashSync(req.body.hash_password, salt)
+  }, function(err, user) {
+    if (err) throw err;
+    console.log(user);
+  })
+}
 
 export function signIn(req, res) {
   User.findOne({

@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
-const userSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
+var userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
@@ -30,8 +29,4 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-UserSchema.methods.comparePassword = function(password) {
-  return bcrypt.compareSync(password, this.hash_password);
-};
-
-export default mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', userSchema);
