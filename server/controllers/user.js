@@ -3,6 +3,7 @@ const User =  require('../models/user');
 var bcrypt = require('bcryptjs');
 var salt = bcrypt.genSaltSync(10);
 
+
 export function listUser(req, res) {
   User.find({}, function (err, user) {
     return res.status(200).json(user);
@@ -27,13 +28,24 @@ export function createUser(req, res) {
 };
 
 export function editUser(req, res) {
-   User.findOneAndUpdate({
-    email: req.body.email,
-    hash_password: bcrypt.hashSync(req.body.hash_password, salt)
-  }, function(err, user) {
-    if (err) throw err;
-    console.log(user);
-  })
+  let id = req.query._id;
+  let data = req.query;
+  User.update({ _id:id }, { $set:data })
+  .exec()
+  .then(() => {
+    res.status(200).json({
+      success: true,
+      message: 'User is updated',
+      updateUser: data,
+    });
+  }) 
+  .catch((err) => {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: 'Server error. Please try again.'
+    });
+  });
 }
 
 export function signIn(req, res) {
