@@ -13,7 +13,6 @@ export function listUser(req, res) {
 // create new cause
 export function createUser(req, res) {
   var newUser = new User(req.body);
-  var hash = bcrypt.hashSync("B4c0/\/", salt);
   newUser.hash_password = bcrypt.hashSync(req.body.hash_password, salt);
   newUser.save(function(err, user) {
     if (err) {
@@ -28,15 +27,35 @@ export function createUser(req, res) {
 };
 
 export function editUser(req, res) {
-  let id = req.query._id;
-  let data = req.query;
-  User.update({ _id:id }, { $set:data })
+  let id = req.params.id;
+  let data = req.body;
+  User.updateOne({ _id:id }, { $set:data })
   .exec()
   .then(() => {
     res.status(200).json({
       success: true,
       message: 'User is updated',
       updateUser: data,
+    });
+  }) 
+  .catch((err) => {
+    res.status(500).json({
+      success: false,
+      message: 'Server error. Please try again.'
+    });
+  });
+}
+
+export function deleteUser(req, res) {
+  let id = req.params.id;
+  User.deleteOne({
+    _id: id
+  })
+  .exec()
+  .then(() => {
+    res.status(200).json({
+      success: true,
+      message: 'User is deleted',
     });
   }) 
   .catch((err) => {

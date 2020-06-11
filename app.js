@@ -24,26 +24,3 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true 
     console.log('Error connecting to database');
   });
 
-// set up home route
-app.get('/', (request, respond) => {
-  respond.status(200).json({
-    message: 'Welcome to Project',
-  });
-});
-app.listen(port, (request, respond) => {
-  console.log(`Our server is live on ${port}. Yay!`);
-});
-app.use('/', mainRoutes);
-
-app.use(function(req, res, next) {
-  if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'JWT') {
-    jsonwebtoken.verify(req.headers.authorization.split(' ')[1], 'RESTFULAPIs', function(err, decode) {
-      if (err) req.user = undefined;
-      req.user = decode;
-      next();
-    });
-  } else {
-    req.user = undefined;
-    next();
-  }
-});
