@@ -11,10 +11,13 @@ const MONGODB_URI = process.env.MONGODB_URI;
 const mainRoutes = require('./server/routes/main');
 
 // set up dependencies
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use('/', mainRoutes);
 app.use(logger('dev'));
-
+app.listen(port, (request, respond) => {
+    console.log(`Our server is live on ${port}. Yay!`);
+});
 // set up mongoose
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(()=> {

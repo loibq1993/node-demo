@@ -1,6 +1,6 @@
 'use strict';
 const Product =  require('../models/product');
-
+const {upload, deleteImage} = require('../helper/upload')
 
 //function
 export function listProduct(req, res) {
@@ -10,12 +10,14 @@ export function listProduct(req, res) {
 }
 
 // create new cause
-export function createProduct(req, res) {
-    req.body['image'] = req.file.originalname;
-
-    var newProduct = new Product(req.body);
-    newProduct.save(function(err, product) {
+export async function createProduct(req, res) {
+    if (req.file) {
+        req.body['image'] = await upload(req.file);
+    }
+    let newProduct = new Product(req.body);
+    newProduct.save(function (err, product) {
         if (err) {
+            deleteImage(req.body['image'])
             return res.status(400).send({
                 message: err
             });
@@ -25,12 +27,20 @@ export function createProduct(req, res) {
     });
 }
 
-export function editProduct(req, res) {
+export async function editProduct(req, res) {
     let id = req.params.id;
     let data = req.body;
-    Product.updateOne({ _id:id }, { $set:data })
+    var oldImage = await Product.findOne({_id: id});
+    console.log(oldImage);
+    if (req.file) {
+        data['image'] = await upload(req.file)
+    }
+    Product.updateOne({_id: id}, {$set: data})
         .exec()
         .then(() => {
+            if (oldImage!==null && oldImage.image !== 'undefined') {
+                deleteImage(oldImage.image)
+            }
             res.status(200).json({
                 success: true,
                 message: 'Product is updated',
@@ -38,6 +48,8 @@ export function editProduct(req, res) {
             });
         })
         .catch((err) => {
+            deleteImage(req.body['image'])
+            console.log(err);
             res.status(500).json({
                 success: false,
                 message: 'Server error. Please try again.'
@@ -45,11 +57,15 @@ export function editProduct(req, res) {
         });
 }
 
-export function deleteProduct(req, res) {
+export async function deleteProduct(req, res) {
     let id = req.params.id;
-    Product.deleteOne({ _id: id})
+    var image = await Product.findOne({_id: id});
+    Product.deleteOne({_id: id})
         .exec()
         .then(() => {
+            if (image.image !== 'undefined') {
+                deleteImage(image.image)
+            }
             res.status(200).json({
                 success: true,
                 message: 'Product is deleted',

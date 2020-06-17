@@ -13,7 +13,7 @@ router.delete('/user/delete/:id', deleteUser);
 //product
 router.get('/product',listProduct);
 router.post('/product/create', uploadCheck.single('image'), createProduct);
-router.put('/product/edit/:id', editProduct);
+router.put('/product/edit/:id', uploadCheck.single('image'), editProduct);
 router.delete('/product/delete/:id', deleteProduct);
 
 

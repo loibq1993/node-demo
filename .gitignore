@@ -1,2 +1,6 @@
 .vscode/
 node_modules
+.idea
+.envsendgrid.env
+sendgrid.env
+server/public/images/*
