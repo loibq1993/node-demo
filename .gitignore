@@ -3,4 +3,5 @@ node_modules
 .idea
 .envsendgrid.env
 sendgrid.env
-server/public/images/*
+server/public/images/sendgrid.env
+sendgrid.env

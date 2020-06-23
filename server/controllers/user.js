@@ -2,7 +2,7 @@
 const User =  require('../models/user');
 var bcrypt = require('bcryptjs');
 var salt = bcrypt.genSaltSync(10);
-
+const {sendWelcomeEmail} = require('../helper/sendmail');
 
 export function listUser(req, res) {
   User.find({}, function (err, user) {
@@ -11,19 +11,21 @@ export function listUser(req, res) {
 }
 
 // create new cause
-export function createUser(req, res) {
+export async function createUser(req, res) {
   var newUser = new User(req.body);
   newUser.hash_password = bcrypt.hashSync(req.body.hash_password, salt);
-  newUser.save(function(err, user) {
-    if (err) {
-      return res.status(400).send({
+  try {
+      await newUser.save();
+      sendWelcomeEmail(newUser.email, newUser.username);
+      newUser.hash_password = undefined;
+      res.status(200).send({
+        newUser
+      });
+  } catch (err) {
+      res.status(400).send({
         message: err
       });
-    } else {
-      user.hash_password = undefined;
-      return res.json(user);
-    }
-  });
+  };
 };
 
 export function editUser(req, res) {

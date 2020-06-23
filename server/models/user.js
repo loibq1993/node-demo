@@ -6,6 +6,7 @@ var userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    unique:true
   },
   hash_password: {
     type: String,
