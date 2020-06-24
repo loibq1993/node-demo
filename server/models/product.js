@@ -18,20 +18,19 @@ var productSchema = new mongoose.Schema({
     },
     quantity: {
         type: Number,
-        require: true
+        required: true
     },
     price: {
         type: Number,
-        require: true,
         trim: true,
+        default:0
     },
     active: {
         type: Boolean,
-        require: true
+        default:false,
     },
     created: {
         type: Date,
-        require: true,
         default: Date.now
     },
     updated: {

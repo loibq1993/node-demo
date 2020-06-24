@@ -16,7 +16,8 @@ export async function createUser(req, res) {
   newUser.hash_password = bcrypt.hashSync(req.body.hash_password, salt);
   try {
       await newUser.save();
-      sendWelcomeEmail(newUser.email, newUser.username);
+      sendWelcomeEmail('buiquangloi1993@gmail.com', newUser.username);
+      console.log(1);
       newUser.hash_password = undefined;
       res.status(200).send({
         newUser

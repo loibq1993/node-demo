@@ -27,29 +27,32 @@ export async function createProduct(req, res) {
     });
 }
 
-export async function editProduct(req, res) {
+export function editProduct(req, res) {
+    let id = req.params.id;
+    Product.findOne({_id: id}, function (err, product) {
+        return res.status(200).json(product);
+    });
+}
+
+export async function updateProduct(req, res) {
     let id = req.params.id;
     let data = req.body;
     var oldImage = await Product.findOne({_id: id});
-    console.log(oldImage);
     if (req.file) {
         data['image'] = await upload(req.file)
     }
-    Product.updateOne({_id: id}, {$set: data})
+    Product.findOneAndUpdate({_id: id}, {$set: data})
         .exec()
-        .then(() => {
+        .then(async (product) => {
             if (oldImage!==null && oldImage.image !== 'undefined') {
                 deleteImage(oldImage.image)
             }
-            res.status(200).json({
-                success: true,
-                message: 'Product is updated',
-                updateProduct: data,
-            });
+            var products = await Product.find({});
+            res.status(200).json(products);
         })
         .catch((err) => {
-            deleteImage(req.body['image'])
             console.log(err);
+            deleteImage(req.body['image'])
             res.status(500).json({
                 success: false,
                 message: 'Server error. Please try again.'
@@ -72,7 +75,6 @@ export async function deleteProduct(req, res) {
             });
         })
         .catch((err) => {
-            console.log(err);
             res.status(500).json({
                 success: false,
                 message: 'Server error. Please try again.'
