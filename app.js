@@ -6,7 +6,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const logger = require('morgan');
-const port = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI;
 const mainRoutes = require('./server/routes/main');
 const cors = require('cors');
@@ -18,8 +18,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/', mainRoutes);
 app.use(logger('dev'));
-app.listen(port, (request, respond) => {
-    console.log(`Our server is live on ${port}. Yay!`);
+app.listen(PORT, (request, respond) => {
+    console.log(`Our server is live on ${PORT}. Yay!`);
 });
 // set up mongoose
 mongoose.set('useFindAndModify', false);

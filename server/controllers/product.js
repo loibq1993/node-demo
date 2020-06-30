@@ -15,14 +15,15 @@ export async function createProduct(req, res) {
         req.body['image'] = await upload(req.file);
     }
     let newProduct = new Product(req.body);
-    newProduct.save(function (err, product) {
+    newProduct.save(async function (err, product) {
         if (err) {
             deleteImage(req.body['image'])
             return res.status(400).send({
                 message: err
             });
         } else {
-            return res.json(product);
+            var products = await Product.find({});
+            return res.json(products);
         }
     });
 }
@@ -65,14 +66,12 @@ export async function deleteProduct(req, res) {
     var image = await Product.findOne({_id: id});
     Product.deleteOne({_id: id})
         .exec()
-        .then(() => {
+        .then(async () => {
             if (image.image !== 'undefined') {
                 deleteImage(image.image)
             }
-            res.status(200).json({
-                success: true,
-                message: 'Product is deleted',
-            });
+            var products = await Product.find({});
+            res.status(200).json(products);
         })
         .catch((err) => {
             res.status(500).json({
