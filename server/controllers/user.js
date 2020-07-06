@@ -3,6 +3,8 @@ const User =  require('../models/user');
 var bcrypt = require('bcryptjs');
 var salt = bcrypt.genSaltSync(10);
 const {sendWelcomeEmail} = require('../helper/sendmail');
+const jwt = require('jsonwebtoken');
+const {generateAuthToken} = require('../helper/jwt.helper')
 
 export function listUser(req, res) {
   User.find({}, function (err, user) {
@@ -19,8 +21,9 @@ export async function createUser(req, res) {
       sendWelcomeEmail('buiquangloi1993@gmail.com', newUser.username);
       console.log(1);
       newUser.hash_password = undefined;
+      const token = await generateAuthToken(user);
       res.status(200).send({
-        newUser
+        newUser, token
       });
   } catch (err) {
       res.status(400).send({
@@ -74,7 +77,6 @@ export function deleteUser(req, res) {
 export async function signIn(req, res) {
   try {
     const user = await User.findOne({email: req.body.email})
-
     if (!user) {
       throw new Error('Unable to login')
     }
@@ -83,7 +85,8 @@ export async function signIn(req, res) {
     if (!isMatch) {
       throw new Error('Unable to login')
     }
-    res.send(user);
+    const token = await generateAuthToken(user);
+    res.send({user, token});
   } catch (e) {
     res.status(400).send(e);
   }
