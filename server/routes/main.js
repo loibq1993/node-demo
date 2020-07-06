@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { listUser, createUser, editUser, deleteUser } = require('../controllers/user');
+const { listUser, createUser, editUser, deleteUser, signIn } = require('../controllers/user');
 const { listProduct, createProduct, editProduct, updateProduct, deleteProduct } = require('../controllers/product');
 const uploadCheck = require('../middleware/uploadMiddleware');
 var helper = require('sendgrid').mail;
@@ -8,12 +8,11 @@ const async = require('async');
 
 //user
 router.get('/user', listUser);
-router.post('/user/create', createUser);
-router.put('/user/edit/:id', editUser);
+router.post('/user/create', uploadCheck.single('image'), createUser);
+router.put('/user/edit/:id',uploadCheck.single('image'), editUser);
 router.delete('/user/delete/:id', deleteUser);
-router.post('/user/send', function (req, res, next) { 
-    
-});
+router.post('/user/send', function (req, res, next) { });
+router.post('/user/login', uploadCheck.single('image'),signIn)
 
 //product
 router.get('/product',listProduct);

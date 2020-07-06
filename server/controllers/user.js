@@ -32,6 +32,7 @@ export async function createUser(req, res) {
 export function editUser(req, res) {
   let id = req.params.id;
   let data = req.body;
+  data.hash_password = bcrypt.hashSync(data.hash_password, salt)
   User.updateOne({ _id:id }, { $set:data })
   .exec()
   .then(() => {
@@ -70,21 +71,22 @@ export function deleteUser(req, res) {
   });
 }
 
-export function signIn(req, res) {
-  User.findOne({
-    email: req.body.email
-  }, function(err, user) {
-    if (err) throw err;
+export async function signIn(req, res) {
+  try {
+    const user = await User.findOne({email: req.body.email})
+
     if (!user) {
-      res.status(401).json({ message: 'Authentication failed. User not found.' });
-    } else if (user) {
-      if (!user.comparePassword(req.body.password)) {
-        res.status(401).json({ message: 'Authentication failed. Wrong password.' });
-      } else {
-        return res.json({token: jwt.sign({ email: user.email, fullName: user.fullName, _id: user._id}, 'RESTFULAPIs')});
-      }
+      throw new Error('Unable to login')
     }
-  });
+    const isMatch = await bcrypt.compare(req.body.hash_password, user.hash_password);
+
+    if (!isMatch) {
+      throw new Error('Unable to login')
+    }
+    res.send(user);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 }
 
 export function loginRequired(req, res, next) {
