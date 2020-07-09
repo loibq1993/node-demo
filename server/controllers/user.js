@@ -19,11 +19,10 @@ export async function createUser(req, res) {
   try {
       await newUser.save();
       sendWelcomeEmail('buiquangloi1993@gmail.com', newUser.username);
-      console.log(1);
       newUser.hash_password = undefined;
-      const token = await generateAuthToken(user);
+      const token = await generateAuthToken(newUser);
       res.status(200).send({
-        newUser, token
+        user: newUser, token
       });
   } catch (err) {
       res.status(400).send({
@@ -33,10 +32,15 @@ export async function createUser(req, res) {
 };
 
 export function editUser(req, res) {
+  let token = req.body.token;
   let id = req.params.id;
   let data = req.body;
+  const filter = {
+    _id:id,
+    'tokens.token': token
+  };
   data.hash_password = bcrypt.hashSync(data.hash_password, salt)
-  User.updateOne({ _id:id }, { $set:data })
+  User.updateOne(filter, { $set:data })
   .exec()
   .then(() => {
     res.status(200).json({
@@ -66,7 +70,6 @@ export function deleteUser(req, res) {
     });
   }) 
   .catch((err) => {
-    console.log(err);
     res.status(500).json({
       success: false,
       message: 'Server error. Please try again.'

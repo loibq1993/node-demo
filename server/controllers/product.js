@@ -52,7 +52,6 @@ export async function updateProduct(req, res) {
             res.status(200).json(products);
         })
         .catch((err) => {
-            console.log(err);
             deleteImage(req.body['image'])
             res.status(500).json({
                 success: false,

@@ -14,7 +14,6 @@ const s3 = new AWS.S3({
 export function upload(image) {
     let imgName = image.originalname.split('.').slice(0, -1).join('.');
     let newName =  imgName + '_' + Date.now() + '.' + image.originalname.split('.').pop();
-    console.log(Buffer.from(image.buffer, 'base64'));
     const params = {
         Bucket: Bucket,
         Key: newName, // File name you want to save as in S3
