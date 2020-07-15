@@ -22,5 +22,4 @@ router.get('/product/edit/:id', [auth, role], editProduct);
 router.put('/product/update/:id', [auth, uploadCheck.single('image'), role], updateProduct);
 router.delete('/product/delete/:id', [auth, role], deleteProduct);
 
-
 module.exports = router;
