@@ -5,7 +5,6 @@ const auth = async (req, res, next) => {
         const token = req.header('Authorization').replace("Bearer ", '');
         const decoded = jwt.verify(token, 'demoapp');
         const user = await User.findOne({_id: decoded._id, 'tokens.token': token})
-
         if (!user) {
             throw new Error()
         }
@@ -14,7 +13,7 @@ const auth = async (req, res, next) => {
         next();
     } catch (e) {
         res.status(401).send({
-            errors: 'Access denied'
+            errors: 'User or password not match'
         })
     }
 }

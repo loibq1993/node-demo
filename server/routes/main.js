@@ -6,19 +6,21 @@ const uploadCheck = require('../middleware/uploadMiddleware');
 var helper = require('sendgrid').mail;
 const async = require('async');
 const auth = require('../middleware/auth')
+const role = require('../middleware/role')
 //user
 router.get('/user', listUser);
-router.post('/user/create', auth, createUser);
-router.put('/user/edit/:id', auth, editUser);
+router.post('/user/create', uploadCheck.single('image'), createUser);
+router.put('/user/edit/:id', uploadCheck.single('image'), editUser);
 router.delete('/user/delete/:id', auth,deleteUser);
-router.post('/user/login', auth,signIn)
+router.post('/user/login', uploadCheck.single('image'), signIn)
 
 //product
-router.get('/product',listProduct);
-router.post('/product/create', [uploadCheck.single('image'), auth], createProduct);
-router.get('/product/edit/:id', [auth], editProduct);
-router.put('/product/update/:id', [auth, uploadCheck.single('image')], updateProduct);
-router.delete('/product/delete/:id', [auth], deleteProduct);
+router.get('/product', auth,listProduct);
+router.get('/product/create', [auth, role], createProduct);
+router.post('/product/store', [uploadCheck.single('image'), auth, role], createProduct);
+router.get('/product/edit/:id', [auth, role], editProduct);
+router.put('/product/update/:id', [auth, uploadCheck.single('image'), role], updateProduct);
+router.delete('/product/delete/:id', [auth, role], deleteProduct);
 
 
 module.exports = router;
